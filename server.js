@@ -6,7 +6,7 @@ const nanoId = require("nanoid");
 
 const app = express();
 
-const filePath = "./data.json"
+const filePath = "./posts.json"
 
 //Create data.json file automaticly
 // fs.writeFile("data.json", JSON.stringify([]), (err) => {
@@ -123,6 +123,49 @@ app.post("/api/v1/posts", (req, res) => {
 })
 
 // TODO: UPDATE post
+app.patch("/api/v1/posts/:postId", (req, res) => {
+    const postId = req.params.postId
+    // const title = req.body.title
+    // const content = req.body.content
+    const {title, content} = req.body
+
+    //Read all the post from DB FIle
+    const data = fs.readFileSync(filePath)
+
+    const posts = JSON.parse(data)
+
+    //Find the index of the post to change
+    const postIndex = posts.findIndex(post => post.id === postId)
+
+    const post = posts[postIndex];
+
+    if(!post) {
+        return res.status(404).json({
+            error: true,
+            message: "Post not found"
+        })
+    }
+
+    // Updat the post 
+
+    const newPost = {
+        ...post,
+        title: title ? title : post.title,
+        content: content ? content : post.content,
+    }
+
+    //save post back to DB
+    posts[postIndex] = newPost
+
+    fs.writeFileSync(filePath, JSON.stringify(posts))
+
+    //send user a response
+
+    res.json({
+        success: true,
+        newPost
+    })
+})
 
 app.delete("/api/v1/posts/:postId", (req, res) => {
     const postId = req.params.postId
