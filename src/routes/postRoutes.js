@@ -1,46 +1,20 @@
 const fs = require("fs")
-
-const express = require("express");
 const nanoId = require("nanoid");
 
+const express = require("express")
 
-const app = express();
+const router = express.Router()
 
-const filePath = "./posts.json"
-
-//Create data.json file automaticly
-// fs.writeFile("data.json", JSON.stringify([]), (err) => {
-//     if(err){
-//         console.log("data file createion failed")
-//     }
-//     else{
-//         console.log("data.jsonj file created successfully")
-//     }
-// })
-
-// parse incomming request body if urlencoded or json
-app.use(express.json());
-app.use(express.urlencoded({extended: true})) 
-
-app.use((req, res, next) => {
-    console.log("ran the middleware")
-
-    next()
-})
+const filePath = "./src/db/posts.json"
 
 
-//TODO: add View engin
-
-app.get("/", (req, res) => {
-    res.send("<h2>Welcome to skill up 23<h2>")
-});
-
-//CRUD
-
-app.get("/api/v1/posts", (req, res) => {
+router.get("/", (req, res) => {
     
     fs.readFile(filePath, (err, data) => {
-        if(err) return Error("Error reading data file")
+        if(err) {
+            console.log(err)
+            return res.status(500).json({error: "internal server error"})
+        }
         const posts = JSON.parse(data)
 
         res.json({
@@ -51,7 +25,7 @@ app.get("/api/v1/posts", (req, res) => {
     
 })
 
-app.get("/api/v1/posts/:postId", (req, res) => {
+router.get("/:postId", (req, res) => {
     const postId = req.params.postId
     
     fs.readFile(filePath, (err, data) => {
@@ -78,7 +52,7 @@ app.get("/api/v1/posts/:postId", (req, res) => {
 
 })
 
-app.post("/api/v1/posts", (req, res) => {
+router.post("/", (req, res) => {
     const {title, content} = req.body
 
     if(!title){
@@ -123,7 +97,7 @@ app.post("/api/v1/posts", (req, res) => {
 })
 
 // TODO: UPDATE post
-app.patch("/api/v1/posts/:postId", (req, res) => {
+router.patch("/:postId", (req, res) => {
     const postId = req.params.postId
     // const title = req.body.title
     // const content = req.body.content
@@ -167,7 +141,7 @@ app.patch("/api/v1/posts/:postId", (req, res) => {
     })
 })
 
-app.delete("/api/v1/posts/:postId", (req, res) => {
+router.delete("/:postId", (req, res) => {
     const postId = req.params.postId
 
     fs.readFile(filePath, (err, data) => {
@@ -198,6 +172,4 @@ app.delete("/api/v1/posts/:postId", (req, res) => {
 
 })
 
-app.listen(5000, () => {
-    console.log("Server is run on port 5000")
-});
+module.exports = router
