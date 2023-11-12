@@ -1,6 +1,7 @@
 const express = require("express");
 
 const postRoutes = require("./routes/postRoutes")
+const authRoutes = require("./routes/authRoutes")
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 //Routes
 app.use("/api/v1/posts", postRoutes)
+app.use("/api/v1/auth", authRoutes)
 
 app.use("*", (req, res) => {
     res.status(404).json({

@@ -19,6 +19,7 @@ router.get("/", (req, res) => {
 
         res.json({
             success: true,
+            postCount: posts.length, 
             posts
         })
     })
